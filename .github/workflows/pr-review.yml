@@ -144,35 +144,35 @@ jobs:
           # 构建发送给 Claude 的提示词（Prompt）
           # ----------------------------------------
           # 这里定义了审查的范围、标准和输出格式
-          PROMPT="Review this Pull Request:
+          PROMPT="Review this Pull Request（请使用中文回答）:
 
-          ## Changed Files (${{ steps.changed.outputs.count }} files)
+          ## 变更文件 (${{ steps.changed.outputs.count }} 个文件)
           ${{ steps.changed.outputs.files }}
 
-          ## Review Guidelines
-          Please review for:
-          1. **Code Quality**: Clean code, proper naming, DRY principle
-          2. **Bugs**: Potential bugs, edge cases, error handling
-          3. **Security**: Security vulnerabilities, input validation
-          4. **Performance**: Inefficient code, unnecessary operations
-          5. **Best Practices**: Framework conventions, patterns
+          ## 审查指南
+          请审查以下方面：
+          1. **代码质量**: 代码整洁性、命名规范、DRY 原则
+          2. **潜在 Bug**: 边界情况、错误处理
+          3. **安全性**: 安全漏洞、输入验证
+          4. **性能**: 低效代码、冗余操作
+          5. **最佳实践**: 框架约定、设计模式
 
-          ## Output Format
-          Provide feedback in this format:
+          ## 输出格式
+          请按以下格式提供反馈：
 
-          ### Summary
-          [1-2 sentence overview]
+          ### 概要
+          [1-2 句话总结]
 
-          ### Issues Found
-          - 🔴 **Critical**: [description] (file:line)
-          - 🟡 **Warning**: [description] (file:line)
-          - 🔵 **Suggestion**: [description] (file:line)
+          ### 发现的问题
+          - 🔴 **严重问题**: [描述] (文件:行号)
+          - 🟡 **警告**: [描述] (文件:行号)
+          - 🔵 **建议**: [描述] (文件:行号)
 
-          ### Recommendations
-          [Actionable suggestions]
+          ### 改进建议
+          [可操作的建议]
 
-          ### Verdict
-          ✅ Approved / ⚠️ Needs Changes / ❌ Request Changes"
+          ### 审查结论
+          ✅ 批准 / ⚠️ 需要修改 / ❌ 要求修改"
 
           # ----------------------------------------
           # 调用 Claude Code（Headless 模式）
