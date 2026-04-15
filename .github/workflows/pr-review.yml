@@ -208,11 +208,14 @@ jobs:
       # 使用 GitHub Script Action 在 PR 中创建评论
       - name: Post Review Comment
         uses: actions/github-script@v7  # GitHub 官方提供的运行 JavaScript 的 action
+        env:
+          # 通过环境变量传递审查结果，避免特殊字符导致的语法错误
+          REVIEW_RESULT: ${{ steps.review.outputs.result }}
         with:
           # 这里编写 JavaScript 代码，可以使用 GitHub API
           script: |
-            // 从上一步获取审查结果
-            const review = `${{ steps.review.outputs.result }}`;
+            // 从环境变量获取审查结果（GitHub Actions 会自动处理转义）
+            const review = process.env.REVIEW_RESULT || '';
 
             // 添加格式化的头部信息
             const comment = `## 🤖 Claude Code Review
