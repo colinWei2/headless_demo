@@ -197,10 +197,12 @@ jobs:
           # jq 是一个 JSON 处理工具，从 review.json 中提取 .result 字段
           RESULT=$(jq -r '.result' review.json)
 
-          # 将结果写入输出变量，使用 EOF 标记来处理多行内容
-          echo "result<<EOF" >> $GITHUB_OUTPUT
-          echo "$RESULT" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          # 使用 base64 编码结果，避免特殊字符导致 Shell 解析错误
+          # 这是最安全的方式，可以传递任意内容（包括代码片段、特殊符号等）
+          ENCODED_RESULT=$(echo "$RESULT" | base64 -w 0)
+
+          # 将编码后的结果写入输出变量
+          echo "result=$ENCODED_RESULT" >> $GITHUB_OUTPUT
 
       # ======================================
       # 步骤 6: 发布审查评论到 PR
@@ -214,8 +216,9 @@ jobs:
         with:
           # 这里编写 JavaScript 代码，可以使用 GitHub API
           script: |
-            // 从环境变量获取审查结果（GitHub Actions 会自动处理转义）
-            const review = process.env.REVIEW_RESULT || '';
+            // 从环境变量获取 base64 编码的审查结果并解码
+            const encoded = process.env.REVIEW_RESULT || '';
+            const review = Buffer.from(encoded, 'base64').toString('utf-8');
 
             // 添加格式化的头部信息
             const comment = `## 🤖 Claude Code Review
@@ -240,8 +243,9 @@ jobs:
       # 根据 Claude 的审查结果，决定工作流是成功还是失败
       - name: Check for critical issues
         run: |
-          # 获取审查结果
-          RESULT="${{ steps.review.outputs.result }}"
+          # 获取 base64 编码的审查结果并解码
+          ENCODED="${{ steps.review.outputs.result }}"
+          RESULT=$(echo "$ENCODED" | base64 -d)
 
           # 如果发现关键问题（🔴 Critical），输出警告
           # grep -q 表示静默搜索（不输出匹配内容）
